@@ -6,5 +6,5 @@ def encode(value: str) -> str:
     return urllib.parse.quote(value)
 
 
-def datetime_to_ms(value: datetime) -> float:
+def to_timestamp(value: datetime) -> float:
     return value.timestamp() * 1000.0
