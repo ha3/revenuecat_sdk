@@ -7,16 +7,7 @@ import requests
 
 from .enums import AttributionSource, PaymentMode, Platform, PromotionDuration
 from .errors import RevenueCatError, Unavailable
-from .response import (
-    Entitlement,
-    NonSubscription,
-    Offering,
-    Offerings,
-    Package,
-    Subscriber,
-    SubscriberAttribute,
-    Subscription,
-)
+from .response import Offering, Offerings, Package, Subscriber, SubscriberAttribute
 from .utils import encode, to_timestamp
 
 JSONType = Union[str, int, float, bool, None, Dict[str, Any], List[Any]]
@@ -82,18 +73,7 @@ class Client:
 
     @staticmethod
     def generate_subscriber_response(data: JSONType) -> Subscriber:
-        subscriber_data = data.copy()
-        map_ = {
-            "entitlements": Entitlement,
-            "subscriptions": Subscription,
-            "non_subscriptions": NonSubscription,
-            "subscriber_attributes": SubscriberAttribute,
-        }
-
-        for k, v in map_.items():
-            subscriber_data[k] = v(**data[k])
-
-        return Subscriber(**subscriber_data)
+        return Subscriber(**data)
 
     @staticmethod
     def generate_offerings_response(data: JSONType) -> Offerings:
@@ -113,20 +93,19 @@ class Client:
 
     def get_subscriber_info(self, app_user_id: str) -> Subscriber:
         path = f"/subscribers/{app_user_id}"
-        key = self.secret_key or self.public_key
+        key = "secret" if self.secret_key else "public"
 
         data = self.make_request("GET", path, key=key)
 
-        return self.generate_subscriber_response(data)
+        return self.generate_subscriber_response(data["subscriber"])
 
     def is_user_subscribed(self, app_user_id: str) -> bool:
         info = self.get_subscriber_info(app_user_id)
-        subscriptions = info["subscriber"]["subscriptions"]
         is_subscribed = False
 
-        if subscriptions != {}:
+        if info.subscriptions:
             expires_date = datetime.strptime(
-                subscriptions["expires_date"], "%Y-%m-%dT%H:%M:%SZ"
+                next(iter(info.subscriptions)).expires_date, "%Y-%m-%dT%H:%M:%SZ"
             )
             if expires_date >= datetime.now():
                 is_subscribed = True

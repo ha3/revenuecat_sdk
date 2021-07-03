@@ -38,10 +38,13 @@ class Subscriber(NamedTuple):
     original_application_version: Optional[str]
     first_seen: str
     last_seen: str
+    management_url: Optional[str]
+    original_purchase_date: Optional[str]
+    other_purchases: dict
     entitlements: Dict[str, Entitlement]
     subscriptions: Dict[str, Subscription]
     non_subscriptions: Dict[str, NonSubscription]
-    subscriber_attributes: Dict[str, SubscriberAttribute]
+    subscriber_attributes: Optional[Dict[str, SubscriberAttribute]] = None
 
 
 class Package(NamedTuple):
