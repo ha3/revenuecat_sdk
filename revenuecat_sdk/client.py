@@ -228,14 +228,14 @@ class Client:
         rc_idfa: str = None,
         rc_gps_adid: str = None,
     ) -> None:
-        path = f"subscribers/{app_user_id}/attribution"
+        path = f"/subscribers/{app_user_id}/attribution"
 
         self.make_request("POST", path, key="public")  # check key
 
         return None
 
     def get_offerings(self, app_user_id: str, platform: Platform) -> Offerings:
-        path = f"subscribers/{app_user_id}/offerings"
+        path = f"/subscribers/{app_user_id}/offerings"
 
         data = self.make_request("GET", path, platform=platform, key="public")
 
